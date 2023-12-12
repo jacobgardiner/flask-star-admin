@@ -43,10 +43,21 @@ def generate_token():
     ).hexdigest()
 
 @blueprint.route('/evelogin')
-@login_required
+#@login_required
 def login():
     state = generate_token
     """Start the OAuth process by redirecting to EVE Online SSO."""
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Host': 'login.eveonline.com',
+    }
+    scopes = [
+        'esi-wallet.read_character_wallet.v1',
+        'esi-skills.read_skills.v1',
+        'esi-fittings.read_fittings.v1',
+        'esi-fittings.write_fittings.v1'
+    ]
+
     oauth_params = {
         'response_type': 'code',
         'redirect_uri': REDIRECT_URI,
@@ -55,17 +66,14 @@ def login():
 #        'scope': 'esi-skills.read_skills.v1',  # Request the needed scope(s)
 #        'scope': 'esi-wallet.read_character_wallet.v1',  # Request the needed scope(s) TODO: specify multiple scopes
         # This isn't doing multiple scopes.
-        'scope': [
-            'esi-wallet.read_character_wallet.v1',
-            'esi-skills.read_skills.v1'
-        ]
+        'scope': ' '.join(scopes)
     }
-    login_url = requests.Request('GET', AUTH_URL, params=oauth_params).prepare().url
+    login_url = requests.Request('GET', AUTH_URL, params=oauth_params, headers=headers).prepare().url
     return redirect(login_url)
 
 
 @blueprint.route('/callback')
-@login_required
+#@login_required
 def callback():
     g.user = current_user.get_id()
     """Handle the callback from EVE Online SSO."""
