@@ -17,6 +17,7 @@ class Users(db.Model, UserMixin):
     username = db.Column(db.String(64), unique=True)
     email = db.Column(db.String(64), unique=True)
     password = db.Column(db.LargeBinary)
+    characters = db.relationship("Characters", backref="owner")
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():

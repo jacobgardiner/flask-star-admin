@@ -1,0 +1,7 @@
+[janice]
+api_key = 1231
+
+[esi]
+client_id = 456
+secret = 789
+callback_url = http://localhost:5000/callback

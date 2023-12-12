@@ -1,0 +1,40 @@
+{% extends "layouts/base.html" %}
+
+<!-- Specific CSS Plugins goes HERE  -->
+{% block css_plugins %}{% endblock css_plugins %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+    <h1 class="title">{% block title %} Toons {% endblock %}</h1>
+    <div class="content">
+        {% for character in characters %}
+            <div class="student">
+                <p><b>Internal ID: {{ character.id }}</b></p>
+                <b>
+                    <p class="name">Character Name: {{ character.name }}</p>
+                </b>
+                <p>Internal Owner ID: {{ character.owner_id }}</p>
+                <p>Character ID: {{ character.character_id }}</p>
+                <p>Access Token: {{ character.access_token }}</p>
+                <p></p><br />
+                <p>Refresh Token: {{ character.refresh_token }}</p>
+                <p>Scopes: {{ character.scopes }}</p>
+                <p>Token Expiry: {{ character.token_expiry }}</p>
+
+
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+<!-- Specific JS Plugins goes HERE  -->
+{% block js_plugins %}
+
+  <script src="{{ config.ASSETS_ROOT }}/vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+
+{% endblock js_plugins %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
