@@ -1,42 +1,35 @@
 #!/usr/bin/env python3
 
-from apps.authentication.models import Users
-
 from datetime import datetime
-
-from esipy import EsiApp
-from esipy import EsiClient
-from esipy import EsiSecurity
-from esipy.exceptions import APIException
-
 from configparser import ConfigParser
+import requests
+import json
+
+from apps.authentication.models import Users
+from apps.eve.models import Characters
+
 # Config
 config = ConfigParser()
 config.read('apps/eve/config.py')
 
-# EVE Online OAuth details
-CLIENT_ID = config.get('esi', 'client_id')
-CLIENT_SECRET = config.get('esi', 'secret')
-REDIRECT_URI = 'http://localhost:5000/callback'  # This should match the one in your EVE Developer account
-AUTH_URL = 'https://login.eveonline.com/v2/oauth/authorize'
-TOKEN_URL = 'https://login.eveonline.com/v2/oauth/token'
+class EveESI():
+    global esi_url
+    esi_url = "https://esi.evetech.net/dev/characters/"
 
-# INIT ESIPY
-esiapp = EsiApp().get_latest_swagger
-esisecurity = EsiSecurity(
-    redirect_uri=REDIRECT_URI,
-    client_id=CLIENT_ID,
-    secret_key=CLIENT_SECRET
-)
-
-class EveESI(char_id):
+    def __init__(self):
+        pass
 
     def get_wallet(char_id):
-        user = Users.query.filter_by(character_id=char_id)
-
-        wallet = None
-        op = esiapp.op['get_characters_character_id_wallet'](
-            character_id=user.character_id
-        )
-        wallet = esiclient.request(op)
+        c = Characters.query.filter_by(id=char_id).first()
+        headers = {"authorization" : "Bearer " + c.access_token}
+        data = requests.get(esi_url + str(c.character_id) + "/wallet", headers=headers)
+        wallet = json.loads(data.text)
         return(wallet)
+    
+    def get_skills(char_id):
+        c = Characters.query.filter_by(id=char_id).first()
+        headers = {"authorization" : "Bearer " + c.access_token}
+        data = requests.get(esi_url + str(c.character_id) + "/skills", headers=headers)
+        print(data)
+        skills = json.loads(data.text)
+        return(skills)
