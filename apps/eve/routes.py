@@ -15,6 +15,7 @@ import json
 from apps.authentication.models import Users
 from apps.eve.models import Characters
 from apps.eve.login import VerifyCharacter
+from apps.eve.get_wallet import EveESI
 
 
 
@@ -43,7 +44,7 @@ def generate_token():
     ).hexdigest()
 
 @blueprint.route('/evelogin')
-#@login_required
+@login_required
 def login():
     state = generate_token
     """Start the OAuth process by redirecting to EVE Online SSO."""
@@ -63,9 +64,6 @@ def login():
         'redirect_uri': REDIRECT_URI,
         'client_id': CLIENT_ID,
         'state': state,
-#        'scope': 'esi-skills.read_skills.v1',  # Request the needed scope(s)
-#        'scope': 'esi-wallet.read_character_wallet.v1',  # Request the needed scope(s) TODO: specify multiple scopes
-        # This isn't doing multiple scopes.
         'scope': ' '.join(scopes)
     }
     login_url = requests.Request('GET', AUTH_URL, params=oauth_params, headers=headers).prepare().url
@@ -94,6 +92,7 @@ def callback():
         tokens = response.json()
         session['access_token'] = tokens['access_token']
         session['refresh_token'] = tokens.get('refresh_token')  # Might not be present depending on scopes
+
         id = current_user.get_id() # change to current user id
         at = tokens['access_token']
         rt = tokens.get('refresh_token')
@@ -101,19 +100,20 @@ def callback():
         db.session.add(character)
         db.session.commit()
         db.session.close()
+
         VerifyCharacter.initial(at)
-        # VerifyCharacter to do initial validation of character
-        # VerifyCharacter.initial(access_token)
-        #return "Authentication successful!"
+
         return redirect("/list")
     else:
         return f"Failed to get tokens. Status code: {response.status_code} - {response.text}"
 
 @blueprint.route("/test")
-@login_required
+#@login_required
 def test():
-    characters = Characters.query.filter_by(id="1").first()
-    data = str(characters.name)
+    #characters = Characters.query.filter_by(id="1").first()
+    #data = str(characters.name)
+    data = str(EveESI.get_skills("1"))
+
     return(data)
 
     

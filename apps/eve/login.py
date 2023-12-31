@@ -23,7 +23,7 @@ class EveLogin:
 # Class to validate character. Input is access token
 class VerifyCharacter():
     def initial(token):
-        character = Characters.query.filter_by(access_token=token)
+        character = Characters.query.filter_by(access_token=token).first()
 
         # Check if initial has been done
         #if not character.name:
@@ -43,7 +43,7 @@ class VerifyCharacter():
             token_expiry = json_response['ExpiresOn']
             scopes = json_response['Scopes']
 
-            character = Characters.query.filter_by(access_token=token)
+            character = Characters.query.filter_by(access_token=token).first()
             character.name = character_name
             character.character_id = character_id
             character.scopes = scopes
